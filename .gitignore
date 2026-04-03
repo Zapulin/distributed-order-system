@@ -1,0 +1,42 @@
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Logs & temp
+**/log/*
+**/tmp/*
+!**/log/.keep
+!**/tmp/.keep
+
+# PIDs
+**/tmp/pids/*
+!**/tmp/pids/.keep
+
+# Gems
+**/vendor/bundle
+**/.bundle/
+
+# Rails master key
+**/config/master.key
+
+# DB locals (per si algú usa sqlite)
+**/*.sqlite3
+**/*.db
+
+# Node (per si algun servei ho usa)
+**/node_modules/
+
+# Coverage
+**/coverage/
+
+# Rails assets
+**/public/assets
+**/public/packs
+
+# Docker
+docker-data/
+*.pid
+
+# TODO: remove when docs are ready
+docs/
