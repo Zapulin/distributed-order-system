@@ -1,6 +1,8 @@
 version: "3.8"
 
 services:
+
+  # Services
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     container_name: zookeeper
@@ -100,6 +102,93 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
+  # Apps
+  orders-api:
+    build:
+      context: ./orders-service
+    container_name: orders-api
+    restart: unless-stopped
+    environment:
+      RAILS_ENV: development
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: order-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: order_db
+      KAFKA_BROKERS: kafka:29092
+    ports:
+      - "3000:3000"
+    depends_on:
+      order-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    command: >
+      sh -c "bundle exec rails db:create db:migrate &&
+             bundle exec rails server -b 0.0.0.0"
+
+  orders-worker:
+    build:
+      context: ./orders-service
+    container_name: orders-worker
+    restart: unless-stopped
+    environment:
+      RAILS_ENV: development
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: order-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: order_db
+      KAFKA_BROKERS: kafka:29092
+    depends_on:
+      orders-api:
+        condition: service_started
+    command: bundle exec karafka server
+
+  inventory-worker:
+    build:
+      context: ./inventory-service
+    container_name: inventory-worker
+    restart: unless-stopped
+    environment:
+      RAILS_ENV: development
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: inventory-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: inventory_db
+      KAFKA_BROKERS: kafka:29092
+    depends_on:
+      inventory-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    command: >
+      sh -c "bundle exec rails db:create db:migrate db:seed &&
+             bundle exec karafka server"
+
+  payments-worker:
+    build:
+      context: ./payments-service
+    container_name: payments-worker
+    restart: unless-stopped
+    environment:
+      RAILS_ENV: development
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: payment-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: payments_db
+      KAFKA_BROKERS: kafka:29092
+    depends_on:
+      payment-db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    command: >
+      sh -c "bundle exec rails db:create db:migrate &&
+             bundle exec karafka server"
 
 volumes:
   order-db-data:
