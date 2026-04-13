@@ -59,8 +59,6 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "54320:5432"
-    volumes:
-      - order-db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d order_db"]
       interval: 10s
@@ -77,8 +75,6 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "54321:5432"
-    volumes:
-      - inventory-db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d inventory_db"]
       interval: 10s
@@ -95,8 +91,6 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "54322:5432"
-    volumes:
-      - payment-db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d payment_db"]
       interval: 10s
@@ -107,6 +101,7 @@ services:
   orders-api:
     build:
       context: ./orders-service
+    platform: linux/amd64
     container_name: orders-api
     restart: unless-stopped
     environment:
@@ -125,12 +120,14 @@ services:
       kafka:
         condition: service_healthy
     command: >
-      sh -c "bundle exec rails db:create db:migrate &&
+      sh -c "rm -f tmp/pids/server.pid &&
+             bundle exec rails db:create db:migrate &&
              bundle exec rails server -b 0.0.0.0"
 
   orders-worker:
     build:
       context: ./orders-service
+    platform: linux/amd64
     container_name: orders-worker
     restart: unless-stopped
     environment:
@@ -149,6 +146,7 @@ services:
   inventory-worker:
     build:
       context: ./inventory-service
+    platform: linux/amd64
     container_name: inventory-worker
     restart: unless-stopped
     environment:
@@ -171,6 +169,7 @@ services:
   payments-worker:
     build:
       context: ./payments-service
+    platform: linux/amd64
     container_name: payments-worker
     restart: unless-stopped
     environment:
@@ -189,8 +188,3 @@ services:
     command: >
       sh -c "bundle exec rails db:create db:migrate &&
              bundle exec karafka server"
-
-volumes:
-  order-db-data:
-  inventory-db-data:
-  payment-db-data:
