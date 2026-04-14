@@ -1,24 +1,32 @@
-# README
+# payments-service
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Servei encarregat del processament de pagaments. Respon a comandes de l'orders-service a través de Kafka. Els pagaments estan simulats per al prototip.
 
-Things you may want to cover:
+## Responsabilitats
 
-* Ruby version
+- Processar la sol·licitud de pagament d'una comanda
+- Publicar el resultat (`PaymentSucceeded` o `PaymentFailed`)
+- Garantir idempotència: un pagament per `order_id` és únic
 
-* System dependencies
+## Models
 
-* Configuration
+- **Payment** — Registre d'un pagament amb estats: `pending`, `succeeded`, `failed`
 
-* Database creation
+## Simulació
 
-* Database initialization
+El servei simula un 80% de pagaments exitosos (`SUCCESS_RATE = 0.8` a `app/services/process_payment.rb`). Per forçar fallades en proves, es pot canviar temporalment a `0.0`.
 
-* How to run the test suite
+## Tòpics Kafka
 
-* Services (job queues, cache servers, search engines, etc.)
+**Consumeix:**
+- `process-payment-requested`
 
-* Deployment instructions
+**Publica:**
+- `payment-succeeded`
+- `payment-failed`
 
-* ...
+## Tecnologies
+
+- Ruby 3.4.8 / Rails 8.1 (API mode)
+- PostgreSQL 16
+- Karafka 2.5 (client Kafka)
