@@ -158,5 +158,6 @@ distributed-order-system/
 
 ## Documentació addicional
 
+- [`docs/architecture.md`](docs/architecture.md) — Arquitectura del sistema
 - [`docs/message-contracts.md`](docs/message-contracts.md) — Tots els missatges Kafka amb el seu format JSON
 - [`docs/implementation-notes.md`](docs/implementation-notes.md) — Decisions de disseny i limitacions
