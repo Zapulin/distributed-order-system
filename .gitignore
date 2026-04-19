@@ -37,6 +37,3 @@
 # Docker
 docker-data/
 *.pid
-
-# TODO: remove when docs are ready
-docs/
