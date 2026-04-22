@@ -21,7 +21,7 @@ La infraestructura inclou un broker Kafka (amb Zookeeper) i tres bases de dades 
 
 ```bash
 # Clonar el repositori
-git clone <url-del-repo>
+git clone https://github.com/Zapulin/distributed-order-system.git
 cd distributed-order-system
 
 # Arrencar tots els contenidors
@@ -122,7 +122,7 @@ Els logs mostren cada transició de la Saga amb el format `[Saga] Order <id>: CR
 
 **Comandes (orders-service):**
 ```bash
-docker exec -it order-db psql -U postgres -d order_db -c "SELECT id, status, total_amount, created_at FROM orders ORDER BY created_at DESC LIMIT 10;"
+docker exec -it order-db psql -U postgres -d order_db -c "SELECT id, status, total_amount, created_at FROM orders;"
 ```
 
 **Estoc i reserves (inventory-service):**
@@ -131,12 +131,12 @@ docker exec -it order-db psql -U postgres -d order_db -c "SELECT id, status, tot
 docker exec -it inventory-db psql -U postgres -d inventory_db -c "SELECT product_id, quantity FROM product_stocks;"
 
 # Reserves actives
-docker exec -it inventory-db psql -U postgres -d inventory_db -c "SELECT order_id, product_id, quantity, status, expires_at FROM stock_reservations ORDER BY created_at DESC LIMIT 10;"
+docker exec -it inventory-db psql -U postgres -d inventory_db -c "SELECT order_id, product_id, quantity, status, expires_at FROM stock_reservations;"
 ```
 
 **Pagaments (payments-service):**
 ```bash
-docker exec -it payment-db psql -U postgres -d payments_db -c "SELECT order_id, status, amount, created_at FROM payments ORDER BY created_at DESC LIMIT 10;"
+docker exec -it payment-db psql -U postgres -d payments_db -c "SELECT order_id, status, amount, created_at FROM payments;"
 ```
 
 ### Estat dels contenidors
